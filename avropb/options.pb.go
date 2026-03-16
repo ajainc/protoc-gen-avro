@@ -33,7 +33,10 @@ type AvroFieldOptions struct {
 	// Scale for decimal logicalType
 	Scale int32 `protobuf:"varint,3,opt,name=scale,proto3" json:"scale,omitempty"`
 	// Size in bytes for Avro fixed type
-	FixedSize     int32 `protobuf:"varint,4,opt,name=fixed_size,json=fixedSize,proto3" json:"fixed_size,omitempty"`
+	FixedSize int32 `protobuf:"varint,4,opt,name=fixed_size,json=fixedSize,proto3" json:"fixed_size,omitempty"`
+	// Explicit name for the Avro fixed type.
+	// If omitted, a deterministic name is auto-generated (e.g. "Decimal38_9").
+	Name          string `protobuf:"bytes,5,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -96,6 +99,13 @@ func (x *AvroFieldOptions) GetFixedSize() int32 {
 	return 0
 }
 
+func (x *AvroFieldOptions) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
 var file_avro_options_proto_extTypes = []protoimpl.ExtensionInfo{
 	{
 		ExtendedType:  (*descriptorpb.FieldOptions)(nil),
@@ -117,13 +127,14 @@ var File_avro_options_proto protoreflect.FileDescriptor
 
 const file_avro_options_proto_rawDesc = "" +
 	"\n" +
-	"\x12avro/options.proto\x12\x04avro\x1a google/protobuf/descriptor.proto\"\x88\x01\n" +
+	"\x12avro/options.proto\x12\x04avro\x1a google/protobuf/descriptor.proto\"\x9c\x01\n" +
 	"\x10AvroFieldOptions\x12!\n" +
 	"\flogical_type\x18\x01 \x01(\tR\vlogicalType\x12\x1c\n" +
 	"\tprecision\x18\x02 \x01(\x05R\tprecision\x12\x14\n" +
 	"\x05scale\x18\x03 \x01(\x05R\x05scale\x12\x1d\n" +
 	"\n" +
-	"fixed_size\x18\x04 \x01(\x05R\tfixedSize:K\n" +
+	"fixed_size\x18\x04 \x01(\x05R\tfixedSize\x12\x12\n" +
+	"\x04name\x18\x05 \x01(\tR\x04name:K\n" +
 	"\x04avro\x12\x1d.google.protobuf.FieldOptions\x18ц\x03 \x01(\v2\x16.avro.AvroFieldOptionsR\x04avroB1Z/github.com/ajainc/protoc-gen-avro/avropb;avropbb\x06proto3"
 
 var (

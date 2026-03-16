@@ -20,6 +20,10 @@ message AvroFieldOptions {
 
   // Size in bytes for Avro fixed type
   int32 fixed_size = 4;
+
+  // Explicit name for the Avro fixed type.
+  // If omitted, a deterministic name is auto-generated (e.g. "Decimal38_9").
+  string name = 5;
 }
 
 extend google.protobuf.FieldOptions {

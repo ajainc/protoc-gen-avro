@@ -1,7 +1,7 @@
 {
   "type": "record",
   "name": "Payment",
-  "namespace": "testdata",
+  "namespace": "mynamespace",
   "fields": [
     {
       "name": "id",
