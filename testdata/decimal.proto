@@ -24,4 +24,11 @@ message Payment {
     (avro.avro).scale = 4,
     (avro.avro).fixed_size = 8
   ];
+  optional bytes custom_amount = 5 [
+    (avro.avro).logical_type = "decimal",
+    (avro.avro).precision = 38,
+    (avro.avro).scale = 9,
+    (avro.avro).fixed_size = 16,
+    (avro.avro).name = "MyCustomDecimal"
+  ];
 }

@@ -51,10 +51,10 @@ func (f Fixed) ToJSON(types *TypeRepo) (any, error) {
 }
 
 // FixedName generates a deterministic name from logicalType parameters.
-// e.g. precision=38, scale=9, size=16 → "Decimal38_9_16"
-func FixedName(logicalType string, precision, scale, size int) string {
+// e.g. precision=38, scale=9 → "Decimal38_9"
+func FixedName(logicalType string, precision, scale int) string {
 	if logicalType == "decimal" {
-		return fmt.Sprintf("Decimal%d_%d_%d", precision, scale, size)
+		return fmt.Sprintf("Decimal%d_%d", precision, scale)
 	}
 	return logicalType
 }

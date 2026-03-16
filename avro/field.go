@@ -75,7 +75,10 @@ func BasicFieldTypeFromProto(fdp *descriptorpb.FieldDescriptorProto) Type {
 			LogMsg("ERROR: %v", err)
 			return Bare("bytes")
 		}
-		name := FixedName(opts.LogicalType, int(opts.Precision), int(opts.Scale), int(opts.FixedSize))
+		name := opts.Name
+		if name == "" {
+			name = FixedName(opts.LogicalType, int(opts.Precision), int(opts.Scale))
+		}
 		return Fixed{
 			Name:        name,
 			Size:        int(opts.FixedSize),
