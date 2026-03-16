@@ -2,7 +2,7 @@ package avro
 
 import (
   "fmt"
-  "github.com/flipp-oss/protoc-gen-avro/input"
+  "github.com/ajainc/protoc-gen-avro/input"
   "slices"
   "strings"
 )

@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package testdata;
+
+import "proto/avro/options.proto";
+
+message Payment {
+  string id = 1;
+  optional bytes amount = 2 [
+    (avro.avro).logical_type = "decimal",
+    (avro.avro).precision = 38,
+    (avro.avro).scale = 9,
+    (avro.avro).fixed_size = 16
+  ];
+  bytes required_amount = 3 [
+    (avro.avro).logical_type = "decimal",
+    (avro.avro).precision = 38,
+    (avro.avro).scale = 9,
+    (avro.avro).fixed_size = 16
+  ];
+  optional bytes fee_rate = 4 [
+    (avro.avro).logical_type = "decimal",
+    (avro.avro).precision = 10,
+    (avro.avro).scale = 4,
+    (avro.avro).fixed_size = 8
+  ];
+}

@@ -1,0 +1,53 @@
+{
+  "type": "record",
+  "name": "Payment",
+  "namespace": "testdata",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string",
+      "default": ""
+    },
+    {
+      "name": "amount",
+      "type": [
+        "null",
+        {
+          "type": "fixed",
+          "name": "Decimal38_9",
+          "size": 16,
+          "logicalType": "decimal",
+          "precision": 38,
+          "scale": 9
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "required_amount",
+      "type": {
+        "type": "fixed",
+        "name": "Decimal38_9",
+        "size": 16,
+        "logicalType": "decimal",
+        "precision": 38,
+        "scale": 9
+      }
+    },
+    {
+      "name": "fee_rate",
+      "type": [
+        "null",
+        {
+          "type": "fixed",
+          "name": "Decimal10_4",
+          "size": 8,
+          "logicalType": "decimal",
+          "precision": 10,
+          "scale": 4
+        }
+      ],
+      "default": null
+    }
+  ]
+}

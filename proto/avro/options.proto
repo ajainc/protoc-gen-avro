@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package avro;
+
+option go_package = "github.com/ajainc/protoc-gen-avro/avropb;avropb";
+
+import "google/protobuf/descriptor.proto";
+
+// AvroFieldOptions allows specifying Avro-specific metadata on proto fields.
+// This is used to generate Avro logicalType annotations (e.g. decimal).
+message AvroFieldOptions {
+  // Avro logicalType (e.g. "decimal", "timestamp-millis")
+  string logical_type = 1;
+
+  // Precision for decimal logicalType
+  int32 precision = 2;
+
+  // Scale for decimal logicalType
+  int32 scale = 3;
+
+  // Size in bytes for Avro fixed type
+  int32 fixed_size = 4;
+}
+
+extend google.protobuf.FieldOptions {
+  AvroFieldOptions avro = 50001;
+}

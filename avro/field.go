@@ -2,16 +2,20 @@ package avro
 
 import (
 	"fmt"
+
+	"github.com/ajainc/protoc-gen-avro/avropb"
 	"github.com/iancoleman/orderedmap"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 type noDefaultType struct{}
+
 var noDefault = noDefaultType{}
 
 type Field struct {
-	Name string
-	Type Type
+	Name    string
+	Type    Type
 	Default any
 }
 
@@ -20,13 +24,13 @@ func (t Field) ToJSON(types *TypeRepo) (any, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error parsing field type %s %w", t.Name, err)
 	}
-  jsonMap := orderedmap.New()
-  jsonMap.Set("name", t.Name)
-  jsonMap.Set("type", typeJson)
+	jsonMap := orderedmap.New()
+	jsonMap.Set("name", t.Name)
+	jsonMap.Set("type", typeJson)
 	var defaultValue any
-  if t.Default != "" {
+	if t.Default != "" {
 		defaultValue = t.Default
-  } else {
+	} else {
 		defaultValue = DefaultValue(typeJson)
 	}
 	// Avro can't actually handle defaults for records
@@ -34,30 +38,42 @@ func (t Field) ToJSON(types *TypeRepo) (any, error) {
 		jsonMap.Set("default", defaultValue)
 	}
 
-  return jsonMap, nil
+	return jsonMap, nil
 }
 
-func FieldFromProto(proto *descriptorpb.FieldDescriptorProto) Field {
-  return Field{
-    Name: proto.GetName(),
-    Type: FieldTypeFromProto(proto),
-    Default: proto.GetDefaultValue(),
-  }
+func FieldFromProto(fdp *descriptorpb.FieldDescriptorProto) Field {
+	return Field{
+		Name:    fdp.GetName(),
+		Type:    FieldTypeFromProto(fdp),
+		Default: fdp.GetDefaultValue(),
+	}
 }
 
-func FieldTypeFromProto(proto *descriptorpb.FieldDescriptorProto) Type {
-	basicType := BasicFieldTypeFromProto(proto)
-	if proto.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED {
+func FieldTypeFromProto(fdp *descriptorpb.FieldDescriptorProto) Type {
+	basicType := BasicFieldTypeFromProto(fdp)
+	if fdp.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED {
 		return Array{Items: basicType}
-	} else if proto.GetProto3Optional() {
+	} else if fdp.GetProto3Optional() {
 		return Union{Types: []Type{Bare("null"), basicType}}
 	} else {
 		return basicType
 	}
 }
 
-func BasicFieldTypeFromProto(proto *descriptorpb.FieldDescriptorProto) Type {
-	switch proto.GetType() {
+func BasicFieldTypeFromProto(fdp *descriptorpb.FieldDescriptorProto) Type {
+	// Check for custom Avro options (logicalType support)
+	if opts := getAvroFieldOptions(fdp); opts != nil && opts.LogicalType != "" {
+		name := FixedName(opts.LogicalType, int(opts.Precision), int(opts.Scale))
+		return Fixed{
+			Name:        name,
+			Size:        int(opts.FixedSize),
+			LogicalType: opts.LogicalType,
+			Precision:   int(opts.Precision),
+			Scale:       int(opts.Scale),
+		}
+	}
+
+	switch fdp.GetType() {
 	case descriptorpb.FieldDescriptorProto_TYPE_FLOAT:
 		return Bare("float")
 	case descriptorpb.FieldDescriptorProto_TYPE_DOUBLE:
@@ -87,13 +103,28 @@ func BasicFieldTypeFromProto(proto *descriptorpb.FieldDescriptorProto) Type {
 	case descriptorpb.FieldDescriptorProto_TYPE_STRING:
 		return Bare("string")
 	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
-		return Ref(proto.GetTypeName())
+		return Ref(fdp.GetTypeName())
 	case descriptorpb.FieldDescriptorProto_TYPE_BYTES:
 		return Bare("bytes")
 	case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
-		return Ref(proto.GetTypeName())
+		return Ref(fdp.GetTypeName())
 	}
-	return Bare(proto.GetName())
+	return Bare(fdp.GetName())
+}
+
+func getAvroFieldOptions(fdp *descriptorpb.FieldDescriptorProto) *avropb.AvroFieldOptions {
+	if fdp.GetOptions() == nil {
+		return nil
+	}
+	ext := proto.GetExtension(fdp.GetOptions(), avropb.E_Avro)
+	if ext == nil {
+		return nil
+	}
+	opts, ok := ext.(*avropb.AvroFieldOptions)
+	if !ok {
+		return nil
+	}
+	return opts
 }
 
 func DefaultValue(t any) any {
@@ -119,15 +150,19 @@ func DefaultValue(t any) any {
 	}
 
 	switch typedT := t.(type) {
-		case []any:
-			return DefaultValue(typedT[0])
-		case *orderedmap.OrderedMap:
-			val, _ := typedT.Get("type")
-			if val == "enum" {
-				defaultVal, _ := typedT.Get("default")
-				return defaultVal
-			}
-			return DefaultValue(val)
+	case []any:
+		return DefaultValue(typedT[0])
+	case *orderedmap.OrderedMap:
+		val, _ := typedT.Get("type")
+		if val == "enum" {
+			defaultVal, _ := typedT.Get("default")
+			return defaultVal
+		}
+		// Fixed type with logicalType defaults to null when in a union
+		if val == "fixed" {
+			return noDefault
+		}
+		return DefaultValue(val)
 	}
 
 	return ""
