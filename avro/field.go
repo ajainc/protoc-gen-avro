@@ -30,6 +30,9 @@ func (t Field) ToJSON(types *TypeRepo) (any, error) {
 	var defaultValue any
 	if t.Default != "" {
 		defaultValue = t.Default
+	} else if isFixedType(t.Type) {
+		// Fixed types (e.g. decimal) have no sensible default — omit the default key.
+		defaultValue = noDefault
 	} else {
 		defaultValue = DefaultValue(typeJson)
 	}
@@ -39,6 +42,12 @@ func (t Field) ToJSON(types *TypeRepo) (any, error) {
 	}
 
 	return jsonMap, nil
+}
+
+// isFixedType returns true if the underlying type is Fixed (not wrapped in Union/Array).
+func isFixedType(t Type) bool {
+	_, ok := t.(Fixed)
+	return ok
 }
 
 func FieldFromProto(fdp *descriptorpb.FieldDescriptorProto) Field {
@@ -61,15 +70,19 @@ func FieldTypeFromProto(fdp *descriptorpb.FieldDescriptorProto) Type {
 }
 
 func BasicFieldTypeFromProto(fdp *descriptorpb.FieldDescriptorProto) Type {
-	// Check for custom Avro options (logicalType support)
-	if opts := getAvroFieldOptions(fdp); opts != nil && opts.LogicalType != "" {
-		name := FixedName(opts.LogicalType, int(opts.Precision), int(opts.Scale))
-		return Fixed{
-			Name:        name,
-			Size:        int(opts.FixedSize),
-			LogicalType: opts.LogicalType,
-			Precision:   int(opts.Precision),
-			Scale:       int(opts.Scale),
+	if opts := getAvroFieldOptions(fdp); opts != nil && opts.LogicalType == "decimal" {
+		if opts.Precision < 1 || opts.FixedSize < 1 {
+			LogMsg("WARNING: field %s has decimal logicalType but invalid precision (%d) or fixed_size (%d), skipping",
+				fdp.GetName(), opts.Precision, opts.FixedSize)
+		} else {
+			name := FixedName(opts.LogicalType, int(opts.Precision), int(opts.Scale))
+			return Fixed{
+				Name:        name,
+				Size:        int(opts.FixedSize),
+				LogicalType: opts.LogicalType,
+				Precision:   int(opts.Precision),
+				Scale:       int(opts.Scale),
+			}
 		}
 	}
 
@@ -158,7 +171,8 @@ func DefaultValue(t any) any {
 			defaultVal, _ := typedT.Get("default")
 			return defaultVal
 		}
-		// Fixed type with logicalType defaults to null when in a union
+		// Fixed types have no sensible default — omit the default key.
+		// In unions (["null", fixed]), the []any branch handles the null default.
 		if val == "fixed" {
 			return noDefault
 		}

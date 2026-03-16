@@ -25,7 +25,17 @@ func (f Fixed) GetNamespace() string {
 	return f.Namespace
 }
 
-func (f Fixed) ToJSON(_ *TypeRepo) (any, error) {
+func (f Fixed) ToJSON(types *TypeRepo) (any, error) {
+	// Avro named types must be defined only once per schema;
+	// subsequent references use the name string alone.
+	key := FullName(f)
+	if types != nil && types.seenTypes != nil && types.seenTypes[key] {
+		return f.Name, nil
+	}
+	if types != nil && types.seenTypes != nil {
+		types.seenTypes[key] = true
+	}
+
 	jsonMap := orderedmap.New()
 	jsonMap.Set("type", "fixed")
 	jsonMap.Set("name", f.Name)
