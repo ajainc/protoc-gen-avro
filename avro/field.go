@@ -71,18 +71,17 @@ func FieldTypeFromProto(fdp *descriptorpb.FieldDescriptorProto) Type {
 
 func BasicFieldTypeFromProto(fdp *descriptorpb.FieldDescriptorProto) Type {
 	if opts := getAvroFieldOptions(fdp); opts != nil && opts.LogicalType == "decimal" {
-		if opts.Precision < 1 || opts.FixedSize < 1 {
-			LogMsg("WARNING: field %s has decimal logicalType but invalid precision (%d) or fixed_size (%d), skipping",
-				fdp.GetName(), opts.Precision, opts.FixedSize)
-		} else {
-			name := FixedName(opts.LogicalType, int(opts.Precision), int(opts.Scale))
-			return Fixed{
-				Name:        name,
-				Size:        int(opts.FixedSize),
-				LogicalType: opts.LogicalType,
-				Precision:   int(opts.Precision),
-				Scale:       int(opts.Scale),
-			}
+		if err := validateDecimalOptions(fdp.GetName(), opts); err != nil {
+			LogMsg("ERROR: %v", err)
+			return Bare("bytes")
+		}
+		name := FixedName(opts.LogicalType, int(opts.Precision), int(opts.Scale), int(opts.FixedSize))
+		return Fixed{
+			Name:        name,
+			Size:        int(opts.FixedSize),
+			LogicalType: opts.LogicalType,
+			Precision:   int(opts.Precision),
+			Scale:       int(opts.Scale),
 		}
 	}
 
@@ -123,6 +122,22 @@ func BasicFieldTypeFromProto(fdp *descriptorpb.FieldDescriptorProto) Type {
 		return Ref(fdp.GetTypeName())
 	}
 	return Bare(fdp.GetName())
+}
+
+func validateDecimalOptions(fieldName string, opts *avropb.AvroFieldOptions) error {
+	if opts.Precision < 1 {
+		return fmt.Errorf("field %s: decimal precision must be >= 1, got %d", fieldName, opts.Precision)
+	}
+	if opts.FixedSize < 1 {
+		return fmt.Errorf("field %s: decimal fixed_size must be >= 1, got %d", fieldName, opts.FixedSize)
+	}
+	if opts.Scale < 0 {
+		return fmt.Errorf("field %s: decimal scale must be >= 0, got %d", fieldName, opts.Scale)
+	}
+	if opts.Scale > opts.Precision {
+		return fmt.Errorf("field %s: decimal scale (%d) must be <= precision (%d)", fieldName, opts.Scale, opts.Precision)
+	}
+	return nil
 }
 
 func getAvroFieldOptions(fdp *descriptorpb.FieldDescriptorProto) *avropb.AvroFieldOptions {

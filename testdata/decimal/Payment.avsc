@@ -14,7 +14,7 @@
         "null",
         {
           "type": "fixed",
-          "name": "Decimal38_9",
+          "name": "Decimal38_9_16",
           "size": 16,
           "logicalType": "decimal",
           "precision": 38,
@@ -25,7 +25,7 @@
     },
     {
       "name": "required_amount",
-      "type": "Decimal38_9"
+      "type": "Decimal38_9_16"
     },
     {
       "name": "fee_rate",
@@ -33,7 +33,7 @@
         "null",
         {
           "type": "fixed",
-          "name": "Decimal10_4",
+          "name": "Decimal10_4_8",
           "size": 8,
           "logicalType": "decimal",
           "precision": 10,
