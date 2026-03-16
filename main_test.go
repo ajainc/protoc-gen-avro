@@ -94,6 +94,10 @@ func Test_PreserveNonStringMaps(t *testing.T) {
     runTest(t, "preserve_non_string_maps", map[string]string{"preserve_non_string_maps": "true"})
 }
 
+func Test_Decimal(t *testing.T) {
+    runTest(t, "decimal", map[string]string{"emit_only": "Payment"})
+}
+
 func assertEqualFiles(t *testing.T, original, generated string) {
     names, err := fileNames(original, false)
     if err != nil {

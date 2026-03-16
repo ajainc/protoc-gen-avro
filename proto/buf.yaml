@@ -1,0 +1,4 @@
+version: v1
+name: buf.build/ajainc/protoc-gen-avro
+deps:
+  - buf.build/protocolbuffers/wellknowntypes

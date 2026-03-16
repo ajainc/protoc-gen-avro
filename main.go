@@ -3,8 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/flipp-oss/protoc-gen-avro/avro"
-	"github.com/flipp-oss/protoc-gen-avro/input"
+	"github.com/ajainc/protoc-gen-avro/avro"
+	"github.com/ajainc/protoc-gen-avro/input"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/pluginpb"
