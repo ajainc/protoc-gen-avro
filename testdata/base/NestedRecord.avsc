@@ -1,0 +1,32 @@
+{
+  "type": "record",
+  "name": "NestedRecord",
+  "namespace": "com.example.v1",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string",
+      "default": ""
+    },
+    {
+      "name": "inner",
+      "type": {
+        "type": "record",
+        "name": "SimpleRecord",
+        "namespace": "com.example.v1",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string",
+            "default": ""
+          },
+          {
+            "name": "value",
+            "type": "int",
+            "default": 0
+          }
+        ]
+      }
+    }
+  ]
+}

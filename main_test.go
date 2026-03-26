@@ -98,6 +98,10 @@ func Test_Decimal(t *testing.T) {
     runTest(t, "decimal", map[string]string{"emit_only": "Payment"})
 }
 
+func Test_FileNamespace(t *testing.T) {
+    runTest(t, "file_namespace", map[string]string{"emit_only": "NestedRecord"})
+}
+
 func assertEqualFiles(t *testing.T, original, generated string) {
     names, err := fileNames(original, false)
     if err != nil {

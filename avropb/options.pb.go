@@ -106,6 +106,53 @@ func (x *AvroFieldOptions) GetName() string {
 	return ""
 }
 
+// AvroFileOptions allows specifying Avro-specific metadata at file level.
+type AvroFileOptions struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Avro namespace for top-level records in this file.
+	// Overrides the namespace_map plugin parameter for this file.
+	Namespace     string `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AvroFileOptions) Reset() {
+	*x = AvroFileOptions{}
+	mi := &file_avro_options_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AvroFileOptions) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AvroFileOptions) ProtoMessage() {}
+
+func (x *AvroFileOptions) ProtoReflect() protoreflect.Message {
+	mi := &file_avro_options_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AvroFileOptions.ProtoReflect.Descriptor instead.
+func (*AvroFileOptions) Descriptor() ([]byte, []int) {
+	return file_avro_options_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *AvroFileOptions) GetNamespace() string {
+	if x != nil {
+		return x.Namespace
+	}
+	return ""
+}
+
 var file_avro_options_proto_extTypes = []protoimpl.ExtensionInfo{
 	{
 		ExtendedType:  (*descriptorpb.FieldOptions)(nil),
@@ -115,12 +162,26 @@ var file_avro_options_proto_extTypes = []protoimpl.ExtensionInfo{
 		Tag:           "bytes,50001,opt,name=avro",
 		Filename:      "avro/options.proto",
 	},
+	{
+		ExtendedType:  (*descriptorpb.FileOptions)(nil),
+		ExtensionType: (*AvroFileOptions)(nil),
+		Field:         50002,
+		Name:          "avro.avro_file",
+		Tag:           "bytes,50002,opt,name=avro_file",
+		Filename:      "avro/options.proto",
+	},
 }
 
 // Extension fields to descriptorpb.FieldOptions.
 var (
 	// optional avro.AvroFieldOptions avro = 50001;
 	E_Avro = &file_avro_options_proto_extTypes[0]
+)
+
+// Extension fields to descriptorpb.FileOptions.
+var (
+	// optional avro.AvroFileOptions avro_file = 50002;
+	E_AvroFile = &file_avro_options_proto_extTypes[1]
 )
 
 var File_avro_options_proto protoreflect.FileDescriptor
@@ -134,8 +195,11 @@ const file_avro_options_proto_rawDesc = "" +
 	"\x05scale\x18\x03 \x01(\x05R\x05scale\x12\x1d\n" +
 	"\n" +
 	"fixed_size\x18\x04 \x01(\x05R\tfixedSize\x12\x12\n" +
-	"\x04name\x18\x05 \x01(\tR\x04name:K\n" +
-	"\x04avro\x12\x1d.google.protobuf.FieldOptions\x18ц\x03 \x01(\v2\x16.avro.AvroFieldOptionsR\x04avroB1Z/github.com/ajainc/protoc-gen-avro/avropb;avropbb\x06proto3"
+	"\x04name\x18\x05 \x01(\tR\x04name\"/\n" +
+	"\x0fAvroFileOptions\x12\x1c\n" +
+	"\tnamespace\x18\x01 \x01(\tR\tnamespace:K\n" +
+	"\x04avro\x12\x1d.google.protobuf.FieldOptions\x18ц\x03 \x01(\v2\x16.avro.AvroFieldOptionsR\x04avro:R\n" +
+	"\tavro_file\x12\x1c.google.protobuf.FileOptions\x18҆\x03 \x01(\v2\x15.avro.AvroFileOptionsR\bavroFileB1Z/github.com/ajainc/protoc-gen-avro/avropb;avropbb\x06proto3"
 
 var (
 	file_avro_options_proto_rawDescOnce sync.Once
@@ -149,18 +213,22 @@ func file_avro_options_proto_rawDescGZIP() []byte {
 	return file_avro_options_proto_rawDescData
 }
 
-var file_avro_options_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_avro_options_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_avro_options_proto_goTypes = []any{
 	(*AvroFieldOptions)(nil),          // 0: avro.AvroFieldOptions
-	(*descriptorpb.FieldOptions)(nil), // 1: google.protobuf.FieldOptions
+	(*AvroFileOptions)(nil),           // 1: avro.AvroFileOptions
+	(*descriptorpb.FieldOptions)(nil), // 2: google.protobuf.FieldOptions
+	(*descriptorpb.FileOptions)(nil),  // 3: google.protobuf.FileOptions
 }
 var file_avro_options_proto_depIdxs = []int32{
-	1, // 0: avro.avro:extendee -> google.protobuf.FieldOptions
-	0, // 1: avro.avro:type_name -> avro.AvroFieldOptions
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	1, // [1:2] is the sub-list for extension type_name
-	0, // [0:1] is the sub-list for extension extendee
+	2, // 0: avro.avro:extendee -> google.protobuf.FieldOptions
+	3, // 1: avro.avro_file:extendee -> google.protobuf.FileOptions
+	0, // 2: avro.avro:type_name -> avro.AvroFieldOptions
+	1, // 3: avro.avro_file:type_name -> avro.AvroFileOptions
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	2, // [2:4] is the sub-list for extension type_name
+	0, // [0:2] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
 }
 
@@ -175,8 +243,8 @@ func file_avro_options_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_avro_options_proto_rawDesc), len(file_avro_options_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
-			NumExtensions: 1,
+			NumMessages:   2,
+			NumExtensions: 2,
 			NumServices:   0,
 		},
 		GoTypes:           file_avro_options_proto_goTypes,
