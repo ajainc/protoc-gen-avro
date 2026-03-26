@@ -26,6 +26,17 @@ message AvroFieldOptions {
   string name = 5;
 }
 
+// AvroFileOptions allows specifying Avro-specific metadata at file level.
+message AvroFileOptions {
+  // Avro namespace for top-level records in this file.
+  // Overrides the namespace_map plugin parameter for this file.
+  string namespace = 1;
+}
+
 extend google.protobuf.FieldOptions {
   AvroFieldOptions avro = 50001;
+}
+
+extend google.protobuf.FileOptions {
+  AvroFileOptions avro_file = 50002;
 }

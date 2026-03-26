@@ -3,14 +3,16 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+	"os"
+	"slices"
+
 	"github.com/ajainc/protoc-gen-avro/avro"
+	"github.com/ajainc/protoc-gen-avro/avropb"
 	"github.com/ajainc/protoc-gen-avro/input"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/pluginpb"
-	"log"
-	"os"
-	"slices"
 )
 
 var params input.Params
@@ -82,7 +84,20 @@ func generateResponse(recordsToEmit []string) *pluginpb.CodeGeneratorResponse {
 	return response
 }
 
+func getFileNamespace(fileProto *descriptorpb.FileDescriptorProto) string {
+	if fileProto.GetOptions() != nil {
+		ext := proto.GetExtension(fileProto.GetOptions(), avropb.E_AvroFile)
+		if opts, ok := ext.(*avropb.AvroFileOptions); ok && opts != nil && opts.GetNamespace() != "" {
+			return opts.GetNamespace()
+		}
+	}
+	return ""
+}
+
 func processAll(fileProto *descriptorpb.FileDescriptorProto) {
+	if ns := getFileNamespace(fileProto); ns != "" {
+		typeRepo.FileNamespaceMap[fileProto.GetPackage()] = ns
+	}
 	for _, t := range fileProto.MessageType {
 		processMessage(t, fileProto.GetPackage())
 	}
