@@ -20,7 +20,7 @@ jobs:
       with:
         go-version: '1.21'
     - name: Install Protoc
-      uses: arduino/setup-protoc@v2
+      uses: arduino/setup-protoc@a8b67ba40b37d35169e222f3bb352603327985b6 # v2
     - run: git reset --hard
     - run: git clean -f -d
     - run: go test ./...
@@ -40,7 +40,7 @@ jobs:
     - run: git reset --hard
     - run: git clean -f -d
     - name: Run GoReleaser
-      uses: goreleaser/goreleaser-action@v3
+      uses: goreleaser/goreleaser-action@b508e2e3ef3b19d4e4146d4f8fb3ba9db644a757 # v3.2.0
       with:
         distribution: goreleaser
         version: latest
