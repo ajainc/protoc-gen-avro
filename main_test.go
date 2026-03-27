@@ -102,6 +102,42 @@ func Test_FileNamespace(t *testing.T) {
     runTest(t, "file_namespace", map[string]string{"emit_only": "NestedRecord"})
 }
 
+func Test_MultiFileNamespace(t *testing.T) {
+    // 同一パッケージ (testdata_multi) 内の複数ファイルが異なる avro_file namespace を持つケース。
+    // AlphaRecord → com.example.alpha, BetaRecord → com.example.beta になることを検証する。
+    runTestWithProtos(t, "multi_namespace",
+        map[string]string{"emit_only": "AlphaRecord;BetaRecord"},
+        []string{"testdata/multi_ns/multi_ns_a.proto", "testdata/multi_ns/multi_ns_b.proto"},
+    )
+}
+
+func runTestWithProtos(t *testing.T, directory string, options map[string]string, protos []string) {
+    workdir, _ := os.Getwd()
+    tmpdir, err := os.MkdirTemp(workdir, "proto-test.")
+    if err != nil {
+        t.Fatal(err)
+    }
+    defer os.RemoveAll(tmpdir)
+
+    args := []string{
+        "-I.",
+        "--avro_out=" + tmpdir,
+    }
+    args = append(args, protos...)
+    for k, v := range options {
+        args = append(args, "--avro_opt=" + k + "=" + v)
+    }
+    protoc(t, args)
+
+    testDir := workdir + "/testdata/" + directory
+    if os.Getenv("UPDATE_SNAPSHOTS") != "" {
+        cmd := exec.Command("/bin/sh", "-c", fmt.Sprintf("cp %v/* %v", tmpdir, testDir))
+        cmd.Run()
+    } else {
+        assertEqualFiles(t, testDir, tmpdir)
+    }
+}
+
 func assertEqualFiles(t *testing.T, original, generated string) {
     names, err := fileNames(original, false)
     if err != nil {

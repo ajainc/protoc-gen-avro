@@ -29,7 +29,7 @@ func (t Record) ToJSON(types *TypeRepo) (any, error) {
 	jsonMap := orderedmap.New()
 	jsonMap.Set("type", "record")
 	jsonMap.Set("name", t.Name)
-	jsonMap.Set("namespace", types.MappedNamespace(t.Namespace))
+	jsonMap.Set("namespace", types.MappedRecordNamespace(t.Namespace, t.Name))
 	fields := make([]any, len(t.Fields))
 	for i, field := range t.Fields {
 		fieldJson, err := field.ToJSON(types)

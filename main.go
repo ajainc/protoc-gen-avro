@@ -95,14 +95,24 @@ func getFileNamespace(fileProto *descriptorpb.FileDescriptorProto) string {
 }
 
 func processAll(fileProto *descriptorpb.FileDescriptorProto) {
+	pkg := fileProto.GetPackage()
 	if ns := getFileNamespace(fileProto); ns != "" {
-		typeRepo.FileNamespaceMap[fileProto.GetPackage()] = ns
+		// ファイルレベルの avro_file option がある場合、各トップレベルメッセージの
+		// Proto FQN (package.MessageName) をキーとして namespace を登録する。
+		// これにより、同一パッケージ内の複数ファイルが異なる namespace を持てる。
+		// ネストされたメッセージは MappedNamespace のプレフィックスマッチで解決される。
+		for _, t := range fileProto.MessageType {
+			typeRepo.FileNamespaceMap[pkg+"."+t.GetName()] = ns
+		}
+		for _, t := range fileProto.EnumType {
+			typeRepo.FileNamespaceMap[pkg+"."+t.GetName()] = ns
+		}
 	}
 	for _, t := range fileProto.MessageType {
-		processMessage(t, fileProto.GetPackage())
+		processMessage(t, pkg)
 	}
 	for _, t := range fileProto.EnumType {
-		processEnum(t, fileProto.GetPackage())
+		processEnum(t, pkg)
 	}
 }
 

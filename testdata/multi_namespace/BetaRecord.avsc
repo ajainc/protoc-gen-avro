@@ -1,0 +1,17 @@
+{
+  "type": "record",
+  "name": "BetaRecord",
+  "namespace": "com.example.beta",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string",
+      "default": ""
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "default": ""
+    }
+  ]
+}

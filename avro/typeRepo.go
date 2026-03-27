@@ -78,6 +78,18 @@ func (r *TypeRepo) LogTypes() {
 	LogObj(keys)
 }
 
+// MappedRecordNamespace resolves the Avro namespace for a top-level record.
+// It first tries a per-message lookup (package.MessageName) in FileNamespaceMap,
+// which allows multiple files in the same proto package to have different Avro namespaces.
+// Falls back to MappedNamespace for general namespace resolution.
+func (r *TypeRepo) MappedRecordNamespace(namespace, name string) string {
+  fqn := namespace + "." + name
+  if ns, ok := r.FileNamespaceMap[fqn]; ok {
+    return ns
+  }
+  return r.MappedNamespace(namespace)
+}
+
 func (r *TypeRepo) MappedNamespace(namespace string) string {
   // File-level option takes precedence (exact prefix match on package).
   for pkg, ns := range r.FileNamespaceMap {
