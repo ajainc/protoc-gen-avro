@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package testdata_multi;
+
+import "proto/avro/options.proto";
+
+option (avro.avro_file) = {namespace: "com.example.beta"};
+
+message BetaRecord {
+  string id = 1;
+  string label = 2;
+}

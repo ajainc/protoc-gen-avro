@@ -1,0 +1,17 @@
+{
+  "type": "record",
+  "name": "AlphaRecord",
+  "namespace": "com.example.alpha",
+  "fields": [
+    {
+      "name": "name",
+      "type": "string",
+      "default": ""
+    },
+    {
+      "name": "value",
+      "type": "int",
+      "default": 0
+    }
+  ]
+}
