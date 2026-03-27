@@ -102,6 +102,13 @@ func Test_FileNamespace(t *testing.T) {
     runTest(t, "file_namespace", map[string]string{"emit_only": "NestedRecord"})
 }
 
+func Test_MessageNameOverride(t *testing.T) {
+    runTestWithProtos(t, "message_name_override",
+        map[string]string{"emit_only": "OriginalName"},
+        []string{"testdata/name_override/message_name_override.proto"},
+    )
+}
+
 func Test_MultiFileNamespace(t *testing.T) {
     // 同一パッケージ (testdata_multi) 内の複数ファイルが異なる avro_file namespace を持つケース。
     // AlphaRecord → com.example.alpha, BetaRecord → com.example.beta になることを検証する。

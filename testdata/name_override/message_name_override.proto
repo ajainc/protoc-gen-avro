@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package testdata;
+
+import "proto/avro/options.proto";
+
+message OriginalName {
+  option (avro.avro_message) = {name: "overridden_name"};
+
+  string id = 1;
+  string value = 2;
+  string proto_field_name = 3 [(avro.avro).field_name = "avro_field_name"];
+}

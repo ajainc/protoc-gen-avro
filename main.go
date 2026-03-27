@@ -32,7 +32,11 @@ func processEnum(proto *descriptorpb.EnumDescriptorProto, protoPackage string) {
 
 func generateFileResponse(record avro.Record) (*pluginpb.CodeGeneratorResponse_File, error) {
 	typeRepo.Start()
-	fileName := fmt.Sprintf("%s.avsc", record.Name)
+	outputName := record.Name
+	if record.AvroName != "" {
+		outputName = record.AvroName
+	}
+	fileName := fmt.Sprintf("%s.avsc", outputName)
 	jsonObj, err := record.ToJSON(typeRepo)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing record %s: %w", record.Name, err)

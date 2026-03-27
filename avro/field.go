@@ -51,8 +51,12 @@ func isFixedType(t Type) bool {
 }
 
 func FieldFromProto(fdp *descriptorpb.FieldDescriptorProto) Field {
+	name := fdp.GetName()
+	if opts := getAvroFieldOptions(fdp); opts != nil && opts.FieldName != "" {
+		name = opts.FieldName
+	}
 	return Field{
-		Name:    fdp.GetName(),
+		Name:    name,
 		Type:    FieldTypeFromProto(fdp),
 		Default: fdp.GetDefaultValue(),
 	}

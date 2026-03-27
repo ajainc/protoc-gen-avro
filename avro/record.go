@@ -2,13 +2,17 @@ package avro
 
 import (
 	"fmt"
-	"github.com/iancoleman/orderedmap"
-	"google.golang.org/protobuf/types/descriptorpb"
 	"slices"
+
+	"github.com/ajainc/protoc-gen-avro/avropb"
+	"github.com/iancoleman/orderedmap"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 type Record struct {
 	Name      string
+	AvroName  string // Avro record 名のオーバーライド。空の場合は Name を使用。
 	Namespace string
 	Fields    []Field
 }
@@ -28,7 +32,11 @@ func (t Record) ToJSON(types *TypeRepo) (any, error) {
 	types.SeenType(t)
 	jsonMap := orderedmap.New()
 	jsonMap.Set("type", "record")
-	jsonMap.Set("name", t.Name)
+	outputName := t.Name
+	if t.AvroName != "" {
+		outputName = t.AvroName
+	}
+	jsonMap.Set("name", outputName)
 	jsonMap.Set("namespace", types.MappedRecordNamespace(t.Namespace, t.Name))
 	fields := make([]any, len(t.Fields))
 	for i, field := range t.Fields {
@@ -105,10 +113,30 @@ func RecordFromProto(proto *descriptorpb.DescriptorProto, namespace string, type
 	for _, enum := range enums {
 		types = append(types, enum)
 	}
+	var avroName string
+	if opts := getAvroMessageOptions(proto); opts != nil && opts.Name != "" {
+		avroName = opts.Name
+	}
 	types = append(types, Record{
 		Name:      proto.GetName(),
+		AvroName:  avroName,
 		Namespace: namespace,
 		Fields:    fields,
 	})
 	return types
+}
+
+func getAvroMessageOptions(mdp *descriptorpb.DescriptorProto) *avropb.AvroMessageOptions {
+	if mdp.GetOptions() == nil {
+		return nil
+	}
+	ext := proto.GetExtension(mdp.GetOptions(), avropb.E_AvroMessage)
+	if ext == nil {
+		return nil
+	}
+	opts, ok := ext.(*avropb.AvroMessageOptions)
+	if !ok {
+		return nil
+	}
+	return opts
 }
