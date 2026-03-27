@@ -1,0 +1,22 @@
+{
+  "type": "record",
+  "name": "overridden_name",
+  "namespace": "testdata",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string",
+      "default": ""
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "default": ""
+    },
+    {
+      "name": "avro_field_name",
+      "type": "string",
+      "default": ""
+    }
+  ]
+}

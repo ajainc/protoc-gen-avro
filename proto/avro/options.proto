@@ -24,6 +24,10 @@ message AvroFieldOptions {
   // Explicit name for the Avro fixed type.
   // If omitted, a deterministic name is auto-generated (e.g. "Decimal38_9").
   string name = 5;
+
+  // Override the Avro field name.
+  // If omitted, the Proto field name is used.
+  string field_name = 6;
 }
 
 // AvroFileOptions allows specifying Avro-specific metadata at file level.
@@ -33,10 +37,23 @@ message AvroFileOptions {
   string namespace = 1;
 }
 
+// AvroMessageOptions allows specifying Avro-specific metadata at message level.
+message AvroMessageOptions {
+  // Override the Avro record name.
+  // If omitted, the Proto message name is used.
+  // Useful when the Proto message name must differ from the desired Avro record name
+  // (e.g. to avoid name collisions within the same Proto package).
+  string name = 1;
+}
+
 extend google.protobuf.FieldOptions {
   AvroFieldOptions avro = 50001;
 }
 
 extend google.protobuf.FileOptions {
   AvroFileOptions avro_file = 50002;
+}
+
+extend google.protobuf.MessageOptions {
+  AvroMessageOptions avro_message = 50003;
 }
